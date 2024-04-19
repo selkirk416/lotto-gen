@@ -4,7 +4,8 @@
   "description": "Generates lotto numbers for various lotteries.",
   "main": "index.js",
   "scripts": {
-    "dev": "electron ."
+    "dev": "electron .",
+    "console": "node lotto.js"
   },
   "author": "selkirk416",
   "license": "Apache-2.0",
