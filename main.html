@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lotto Numbers Generator</title>
+  <link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+
+  <div class="loading-bg" id="load-id">
+    <div class="loading-image-container">
+      <img class="loading-image" src='./img/test.gif' alt="">
+      <p id="animated">Load</p>
+    </div>
+  </div>
+
+
+  <div class="main_container">
+    <div class="title">
+      <h1>Lotto Numbers Generator</h1>
+    </div>
+
+    <div class="main_stuff">
+
+      <div class="parameters">
+        <form class="controls">
+          <label for="lotto-options">Select which lotto you are playing: </label>
+          <select name="lotto-options" id="lotto-selector">
+            <option value="powerball" selected>PowerBall</option>
+            <option value="megamillions">Mega Millions</option>
+          </select><br>
+
+          <label for="">Enter the number of plays you want: </label>
+          <input id="plays" type="number" min="1" max="5" step="1" required><br>
+
+          <button type="submit">Enter</button>
+        </form>
+      </div>
+
+      <div class="results">
+        <div class="result-title">
+          <span id="game-title">Game Update</span>
+        </div>
+        <div class="result-body">
+          <ul>
+            <form action="" id="lotto-result">
+              <p>
+                <input type="text" id="lotto1" name="lotto1" class="lotto-res-input" value="" disabled maxlength="1">
+                <input type="text" id="lotto2" name="lotto2" class="lotto-res-input" value="" disabled maxlength="1">
+                <input type="text" id="lotto3" name="lotto3" class="lotto-res-input" value="" disabled maxlength="1">
+                <input type="text" id="lotto4" name="lotto4" class="lotto-res-input" value="" disabled maxlength="1">
+                <input type="text" id="lotto5" name="lotto5" class="lotto-res-input" value="" disabled maxlength="1">
+                <input type="text" id="lotto6" name="lotto6" class="lotto-res-input lotto-res-input-final" value="" disabled maxlength="1">
+              </p>
+            </form>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    function wavy(text) {
+      let delay = 200;
+      let target_text = document.getElementById("animated");
+      target_text.innerHTML = text.split("").map(letter => {
+        return `<span>` + letter + `</span>`;
+      }).join("");
+
+      Array.from(target_text.children).forEach((span, index) => {
+          setTimeout(() => {
+            span.classList.add("wavy");
+          }, index * 60 + delay);
+        });
+    }
+
+    wavy("Loading...");
+
+    const electron = require('electron');
+    const { ipcRenderer } = electron;
+    const results_title = document.getElementById("game-title");
+    const results_container = document.querySelector('ul');
+
+
+
+    let ref_obj = null;
+
+    // capture the submit value and prepare it for calculations
+    document.querySelector('form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const plays = parseInt(document.getElementById("plays").value);
+      const lotto_option = document.getElementById("lotto-selector").value;
+      let lotto_info = {
+        option: lotto_option,
+        plays: plays
+      };
+      ref_obj = lotto_info;
+
+      // clear the form and the previous results
+      document.querySelector('form').reset();
+      results_container.innerHTML = "";
+
+      // send the data in for calculations
+      ipcRenderer.send('raw_lotto_information_ch', lotto_info);
+    });
+
+
+    // receive the calculation back from node and display it
+    ipcRenderer.on('refined_lotto_information_ch', (event, lotto_info) => {
+      console.log(lotto_info);
+      let lotto_result = []
+
+      let lotto_container = document.querySelector("#lotto-result");
+      console.log(lotto_container);
+
+
+      for (let i = 0; i < lotto_info.plays; i++) {
+        // create the html form to house the numbers
+        let lotto_form = document.createElement('form');
+        lotto_form.setAttribute('id', 'lotto-result');
+
+
+
+
+
+
+
+        let li_result = document.createElement('li');
+        let li_text = document.createTextNode(
+          `${lotto_info.numbers[i][0]} ${lotto_info.numbers[i][1]} ${lotto_info.numbers[i][2]} ${lotto_info.numbers[i][3]} ${lotto_info.numbers[i][4]}  Special: ${lotto_info.numbers[i][5]}`
+        );
+        li_result.classList.add("result_nums");
+        li_result.appendChild(li_text);
+        lotto_result.push(li_result);
+      }
+
+      for (const k of lotto_result) {
+        results_container.appendChild(k);
+      }
+      results_title.innerHTML = lotto_info.option;
+    });
+
+    //have it wait 1.3sec so that everything loads up
+    // setTimeout(() => {
+    //   let load_screen = document.getElementById("load-id");
+    //   load_screen.classList.add("loaded");
+    // }, 100);
+
+    let load_screen = document.getElementById("load-id");
+    load_screen.classList.add("loaded");
+  </script>
+
+</body>
+</html>

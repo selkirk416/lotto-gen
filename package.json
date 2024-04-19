@@ -1,0 +1,19 @@
+{
+  "name": "lotto_gen",
+  "version": "0.0.1",
+  "description": "Generates lotto numbers for various lotteries.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "electron ."
+  },
+  "author": "selkirk416",
+  "license": "Apache-2.0",
+  "private": false,
+  "dependencies": {
+    "ascii-table3": "^0.8.2",
+    "electron": "^24.1.2",
+    "electron-reload": "^2.0.0-alpha.1",
+    "prompt-sync": "^4.2.0",
+    "tailwindcss": "^3.3.2"
+  }
+}
